@@ -3,44 +3,61 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Auth\LoginRequest;
+use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class AuthenticatedSessionController extends Controller
 {
-    public function create()
+    /**
+     * Display the login view.
+     */
+    public function create(): View
     {
         return view('auth.login');
     }
 
-    public function store(Request $request): RedirectResponse
+    /**
+     * Handle an incoming authentication request.
+     */
+    public function store(LoginRequest $request): RedirectResponse
     {
-        $credentials = $request->validate([
-            'email' => ['required', 'email'],
-            'password' => ['required'],
-        ]);
-
-        $remember = $request->boolean('remember');
-
-        if (! Auth::attempt($credentials, $remember)) {
-            return back()
-                ->withErrors(['email' => 'The provided credentials do not match our records.'])
-                ->onlyInput('email');
-        }
+        $request->authenticate();
 
         $request->session()->regenerate();
 
-        return redirect()->intended(route('home'));
+        return redirect()->intended($this->redirectPath());
     }
 
+    /**
+     * Destroy an authenticated session.
+     */
     public function destroy(Request $request): RedirectResponse
     {
-        Auth::logout();
+        Auth::guard('web')->logout();
 
         $request->session()->invalidate();
+
         $request->session()->regenerateToken();
 
-        return redirect()->route('home');
+        return redirect('/');
+    }
+
+    protected function redirectPath(): string
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return route('home');
+        }
+
+        return match ($user->role) {
+            User::ROLE_ADMIN => route('admin.dashboard'),
+            User::ROLE_VENDOR => route('vendor.dashboard'),
+            default => route('home'),
+        };
     }
 }

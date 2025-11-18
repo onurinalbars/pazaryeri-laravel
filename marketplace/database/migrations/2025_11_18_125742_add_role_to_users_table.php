@@ -12,8 +12,16 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            if (!Schema::hasColumn('users', 'role')) {
-                $table->string('role')->default('customer')->after('password');
+            if (! Schema::hasColumn('users', 'role')) {
+                $table->enum('role', ['admin', 'vendor', 'user'])
+                    ->default('user')
+                    ->after('password');
+            }
+
+            if (! Schema::hasColumn('users', 'vendor_status')) {
+                $table->enum('vendor_status', ['pending', 'approved', 'suspended'])
+                    ->nullable()
+                    ->after('role');
             }
         });
     }
@@ -24,6 +32,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
+            if (Schema::hasColumn('users', 'vendor_status')) {
+                $table->dropColumn('vendor_status');
+            }
+
             if (Schema::hasColumn('users', 'role')) {
                 $table->dropColumn('role');
             }

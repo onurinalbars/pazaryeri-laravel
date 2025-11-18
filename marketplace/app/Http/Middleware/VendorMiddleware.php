@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -20,6 +21,28 @@ class VendorMiddleware
 
         if (! $user?->isVendor()) {
             abort(403, 'Only vendors can access this area.');
+        }
+
+        if ($user->vendor_status === null) {
+            $user->forceFill([
+                'vendor_status' => User::VENDOR_STATUS_PENDING,
+            ])->save();
+        }
+
+        if ($user->vendor_status === User::VENDOR_STATUS_SUSPENDED) {
+            abort(403, 'Your vendor account is suspended.');
+        }
+
+        $pendingAllowedRoutes = [
+            'vendor.pending',
+            'vendor.shop.edit',
+            'vendor.shop.update',
+            'vendor.payment.edit',
+            'vendor.payment.update',
+        ];
+
+        if ($user->vendor_status !== User::VENDOR_STATUS_APPROVED && ! $request->routeIs($pendingAllowedRoutes)) {
+            return redirect()->route('vendor.pending');
         }
 
         if (! $user->shop) {

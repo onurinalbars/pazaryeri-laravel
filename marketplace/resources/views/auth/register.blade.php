@@ -1,37 +1,59 @@
-@extends('layouts.app')
+<x-guest-layout>
+    <form method="POST" action="{{ route('register') }}">
+        @csrf
 
-@section('content')
-    <div class="mx-auto max-w-md rounded-2xl bg-white p-6 shadow">
-        <h1 class="text-2xl font-bold text-gray-900">Kayıt Ol</h1>
-        <form method="POST" action="{{ route('register') }}" class="mt-6 space-y-4">
-            @csrf
-            <label class="text-sm font-semibold text-gray-700">
-                Ad Soyad
-                <input type="text" name="name" value="{{ old('name') }}" required class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2">
-            </label>
-            <label class="text-sm font-semibold text-gray-700">
-                E-posta
-                <input type="email" name="email" value="{{ old('email') }}" required class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2">
-            </label>
-            <div class="grid gap-4 md:grid-cols-2">
-                <label class="text-sm font-semibold text-gray-700">
-                    Şifre
-                    <input type="password" name="password" required class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2">
-                </label>
-                <label class="text-sm font-semibold text-gray-700">
-                    Şifre Tekrar
-                    <input type="password" name="password_confirmation" required class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2">
-                </label>
-            </div>
-            <label class="flex items-start gap-2 text-sm text-gray-600">
-                <input type="checkbox" name="register_as_vendor" value="1" class="mt-1 rounded border-gray-300" @checked(old('register_as_vendor'))>
-                <span>Mağaza sahibi olmak istiyorum</span>
-            </label>
-            <label class="text-sm font-semibold text-gray-700">
-                Mağaza İsmi (opsiyonel)
-                <input type="text" name="shop_name" value="{{ old('shop_name') }}" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" placeholder="Örn. DigitalCity">
-            </label>
-            <button type="submit" class="w-full rounded-full bg-emerald-500 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-600">Kayıt Ol</button>
-        </form>
+        <!-- Name -->
+        <div>
+            <x-input-label for="name" :value="__('Name')" />
+            <x-text-input id="name" class="block mt-1 w-full" type="text" name="name" :value="old('name')" required autofocus autocomplete="name" />
+            <x-input-error :messages="$errors->get('name')" class="mt-2" />
+        </div>
+
+        <!-- Email Address -->
+        <div class="mt-4">
+            <x-input-label for="email" :value="__('Email')" />
+            <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autocomplete="username" />
+            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+        </div>
+
+        <!-- Password -->
+        <div class="mt-4">
+            <x-input-label for="password" :value="__('Password')" />
+
+            <x-text-input id="password" class="block mt-1 w-full"
+                            type="password"
+                            name="password"
+                            required autocomplete="new-password" />
+
+            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        </div>
+
+        <!-- Confirm Password -->
+        <div class="mt-4">
+            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
+
+            <x-text-input id="password_confirmation" class="block mt-1 w-full"
+                            type="password"
+                            name="password_confirmation" required autocomplete="new-password" />
+
+            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+        </div>
+
+        <div class="flex items-center justify-end mt-4">
+            <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
+                {{ __('Already registered?') }}
+            </a>
+
+            <x-primary-button class="ms-4">
+                {{ __('Register') }}
+            </x-primary-button>
+        </div>
+    </form>
+
+    <div class="mt-6 text-center text-sm text-gray-600">
+        <p>
+            Satıcı mı olmak istiyorsunuz?
+            <a href="{{ route('vendor.register') }}" class="font-semibold text-emerald-700 hover:underline">Vendor başvurusu yapın</a>
+        </p>
     </div>
-@endsection
+</x-guest-layout>

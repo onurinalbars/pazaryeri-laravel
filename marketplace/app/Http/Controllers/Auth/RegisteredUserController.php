@@ -3,55 +3,50 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Models\Shop;
 use App\Models\User;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
-use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\Rules;
+use Illuminate\View\View;
 
 class RegisteredUserController extends Controller
 {
-    public function create()
+    /**
+     * Display the registration view.
+     */
+    public function create(): View
     {
         return view('auth.register');
     }
 
+    /**
+     * Handle an incoming registration request.
+     *
+     * @throws \Illuminate\Validation\ValidationException
+     */
     public function store(Request $request): RedirectResponse
     {
-        $validated = $request->validate([
+        $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email'],
-            'password' => ['required', 'confirmed', Password::defaults()],
-            'register_as_vendor' => ['nullable', 'boolean'],
-            'shop_name' => ['nullable', 'string', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
-
-        $role = ! empty($validated['register_as_vendor']) ? 'vendor' : 'customer';
 
         $user = User::create([
-            'name' => $validated['name'],
-            'email' => $validated['email'],
-            'password' => Hash::make($validated['password']),
-            'role' => $role,
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'role' => User::ROLE_USER,
+            'vendor_status' => null,
         ]);
 
-        if ($role === 'vendor') {
-            $shopName = $validated['shop_name'] ?: "{$user->name} Shop";
-
-            Shop::create([
-                'user_id' => $user->id,
-                'name' => $shopName,
-                'slug' => Str::slug($shopName).'-'.Str::lower(Str::random(4)),
-                'description' => null,
-                'is_active' => false,
-            ]);
-        }
+        event(new Registered($user));
 
         Auth::login($user);
 
-        return redirect()->intended(route('home'))->with('success', 'Welcome aboard!');
+        return redirect(route('dashboard', absolute: false));
     }
 }

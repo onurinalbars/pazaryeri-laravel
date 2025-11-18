@@ -10,7 +10,7 @@ class AdminVendorController extends Controller
 {
     public function index()
     {
-        $vendors = User::where('role', 'vendor')
+        $vendors = User::where('role', User::ROLE_VENDOR)
             ->with(['shop' => function ($query) {
                 $query->withCount(['products', 'orders']);
             }])
@@ -18,12 +18,12 @@ class AdminVendorController extends Controller
             ->paginate(20);
 
         $metrics = [
-            'total' => User::where('role', 'vendor')->count(),
-            'approved' => User::where('role', 'vendor')
-                ->whereHas('shop', fn ($query) => $query->where('is_active', true))
+            'total' => User::where('role', User::ROLE_VENDOR)->count(),
+            'approved' => User::where('role', User::ROLE_VENDOR)
+                ->where('vendor_status', User::VENDOR_STATUS_APPROVED)
                 ->count(),
-            'pending' => User::where('role', 'vendor')
-                ->whereHas('shop', fn ($query) => $query->where('is_active', false))
+            'pending' => User::where('role', User::ROLE_VENDOR)
+                ->where('vendor_status', User::VENDOR_STATUS_PENDING)
                 ->count(),
         ];
 
@@ -60,25 +60,27 @@ class AdminVendorController extends Controller
         $this->ensureVendor($vendor);
 
         $data = $request->validate([
-            'status' => ['required', 'in:approved,suspended'],
+            'status' => ['required', 'in:pending,approved,suspended'],
             'note' => ['nullable', 'string', 'max:500'],
         ]);
 
         $shop = $vendor->shop;
 
-        if (! $shop) {
-            return back()->withErrors('Bu vendora ait mağaza bulunamadı.');
-        }
-
-        $shop->update([
-            'is_active' => $data['status'] === 'approved',
+        $vendor->update([
+            'vendor_status' => $data['status'],
         ]);
+
+        if ($shop) {
+            $shop->update([
+                'is_active' => $data['status'] === User::VENDOR_STATUS_APPROVED,
+            ]);
+        }
 
         return back()->with('success', 'Vendor durumu güncellendi.');
     }
 
     protected function ensureVendor(User $user): void
     {
-        abort_if($user->role !== 'vendor', 404);
+        abort_if($user->role !== User::ROLE_VENDOR, 404);
     }
 }
