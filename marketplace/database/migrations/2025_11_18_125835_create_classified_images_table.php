@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('banners', function (Blueprint $table) {
+        Schema::create('classified_images', function (Blueprint $table) {
             $table->id();
-            $table->string('title');
-            $table->string('image');
-            $table->string('link')->nullable();
-            $table->string('position')->default('home');
-            $table->boolean('is_active')->default(true);
+            $table->foreignId('classified_id')->constrained('classifieds')->cascadeOnDelete();
+            $table->string('file_path');
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('banners');
+        Schema::dropIfExists('classified_images');
     }
 };

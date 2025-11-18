@@ -16,14 +16,10 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('name');
             $table->string('slug')->unique();
-            $table->string('logo')->nullable();
             $table->text('description')->nullable();
-            $table->boolean('is_active')->default(false);
-            $table->string('pos_provider')->nullable();
-            $table->string('pos_merchant_id')->nullable();
-            $table->string('pos_api_key')->nullable();
-            $table->string('pos_secret_key')->nullable();
-            $table->json('pos_extra_config')->nullable();
+            $table->string('logo')->nullable();
+            $table->string('banner')->nullable();
+            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
