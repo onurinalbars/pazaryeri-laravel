@@ -1,0 +1,2 @@
+# pazaryeri-laravel
+Initial commit
