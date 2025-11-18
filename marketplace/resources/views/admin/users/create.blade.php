@@ -1,8 +1,8 @@
-@extends('layouts.admin')
+@extends('admin.layout')
 
 @section('page-title', 'Yeni Kullanıcı')
 
-@section('content')
+@section('admin-content')
     <div class="rounded-2xl bg-white p-6 shadow">
         <h1 class="text-xl font-semibold text-gray-800">Yeni Kullanıcı</h1>
         <form method="POST" action="{{ route('admin.users.store') }}" class="mt-6 space-y-4">
