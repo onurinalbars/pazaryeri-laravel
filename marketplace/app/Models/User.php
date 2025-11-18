@@ -22,6 +22,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'vendor_status',
     ];
 
     /**
@@ -70,5 +71,15 @@ class User extends Authenticatable
     public function isVendor(): bool
     {
         return $this->role === 'vendor';
+    }
+
+    public function isVendorApproved(): bool
+    {
+        return $this->isVendor() && $this->vendor_status === 'approved';
+    }
+
+    public function isVendorPending(): bool
+    {
+        return $this->isVendor() && $this->vendor_status === 'pending';
     }
 }

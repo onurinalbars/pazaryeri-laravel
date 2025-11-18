@@ -25,6 +25,7 @@ use App\Http\Controllers\Vendor\VendorDashboardController;
 use App\Http\Controllers\Vendor\VendorListingController;
 use App\Http\Controllers\Vendor\VendorOrderController;
 use App\Http\Controllers\Vendor\VendorPaymentController;
+use App\Http\Controllers\Vendor\VendorPendingController;
 use App\Http\Controllers\Vendor\VendorProductController;
 use App\Http\Controllers\Vendor\VendorShopController;
 use Illuminate\Support\Facades\Route;
@@ -72,15 +73,21 @@ Route::middleware(['auth', 'vendor'])
     ->name('vendor.')
     ->group(function () {
         Route::get('/dashboard', [VendorDashboardController::class, 'index'])->name('dashboard');
-        Route::resource('/products', VendorProductController::class)->except('show');
-        Route::resource('/listings', VendorListingController::class)->except('show');
-        Route::get('/shop', [VendorShopController::class, 'edit'])->name('shop.edit');
-        Route::post('/shop', [VendorShopController::class, 'update'])->name('shop.update');
-        Route::get('/payment-settings', [VendorPaymentController::class, 'edit'])->name('payment.edit');
-        Route::post('/payment-settings', [VendorPaymentController::class, 'update'])->name('payment.update');
+        Route::get('/pending', VendorPendingController::class)->name('pending');
+
+        Route::resource('products', VendorProductController::class)->except('show');
+
         Route::get('/orders', [VendorOrderController::class, 'index'])->name('orders.index');
         Route::get('/orders/{order}', [VendorOrderController::class, 'show'])->name('orders.show');
         Route::patch('/orders/{order}', [VendorOrderController::class, 'update'])->name('orders.update');
+
+        Route::resource('listings', VendorListingController::class)->except('show');
+
+        Route::get('/shop/edit', [VendorShopController::class, 'edit'])->name('shop.edit');
+        Route::put('/shop', [VendorShopController::class, 'update'])->name('shop.update');
+
+        Route::get('/payment', [VendorPaymentController::class, 'edit'])->name('payment.edit');
+        Route::put('/payment', [VendorPaymentController::class, 'update'])->name('payment.update');
     });
 
 // Admin panel

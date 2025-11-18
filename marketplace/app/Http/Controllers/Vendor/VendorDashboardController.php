@@ -9,7 +9,11 @@ class VendorDashboardController extends Controller
 {
     public function index(Request $request)
     {
-        $shop = $request->user()->shop()->withCount(['products', 'listings'])->first();
+        $shop = $request->user()
+            ->shop()
+            ->withCount(['products', 'listings'])
+            ->firstOrFail();
+
         $recentOrders = $shop->orders()
             ->latest()
             ->take(5)
@@ -23,6 +27,11 @@ class VendorDashboardController extends Controller
             'listings' => $shop->listings_count,
         ];
 
-        return view('vendor.dashboard', compact('shop', 'recentOrders', 'metrics'));
+        return view('vendor.dashboard', [
+            'shop' => $shop,
+            'recentOrders' => $recentOrders,
+            'metrics' => $metrics,
+            'vendorStatus' => $request->user()->vendor_status,
+        ]);
     }
 }

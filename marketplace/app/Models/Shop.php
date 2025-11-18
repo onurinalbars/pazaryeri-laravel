@@ -14,6 +14,7 @@ class Shop extends Model
         'name',
         'slug',
         'logo',
+        'banner',
         'description',
         'is_active',
         'pos_provider',
@@ -46,6 +47,11 @@ class Shop extends Model
     public function orders()
     {
         return $this->hasMany(Order::class);
+    }
+
+    public function vendorSetting()
+    {
+        return $this->hasOne(VendorSetting::class);
     }
 
     public function scopeActive($query)

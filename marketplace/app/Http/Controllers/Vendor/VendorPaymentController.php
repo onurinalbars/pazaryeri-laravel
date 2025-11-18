@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Vendor;
 
 use App\Http\Controllers\Controller;
+use App\Models\VendorSetting;
 use Illuminate\Http\Request;
 
 class VendorPaymentController extends Controller
@@ -10,8 +11,9 @@ class VendorPaymentController extends Controller
     public function edit(Request $request)
     {
         $shop = $request->user()->shop;
+        $settings = $shop->vendorSetting ?: new VendorSetting(['shop_id' => $shop->id]);
 
-        return view('vendor.payment.edit', compact('shop'));
+        return view('vendor.payment.edit', compact('shop', 'settings'));
     }
 
     public function update(Request $request)
@@ -19,31 +21,38 @@ class VendorPaymentController extends Controller
         $shop = $request->user()->shop;
 
         $data = $request->validate([
-            'pos_provider' => ['nullable', 'string', 'max:120'],
-            'pos_merchant_id' => ['nullable', 'string', 'max:255'],
             'pos_api_key' => ['nullable', 'string', 'max:255'],
-            'pos_secret_key' => ['nullable', 'string', 'max:255'],
-            'pos_extra_config' => ['nullable', 'string'],
+            'pos_api_secret' => ['nullable', 'string', 'max:255'],
+            'pos_merchant_id' => ['nullable', 'string', 'max:255'],
+            'pos_terminal_id' => ['nullable', 'string', 'max:255'],
+            'pos_environment' => ['nullable', 'string', 'max:120'],
+            'extra_payload' => ['nullable', 'string'],
         ]);
 
-        $extraConfig = null;
-        if (! empty($data['pos_extra_config'])) {
-            $decoded = json_decode($data['pos_extra_config'], true);
+        $extraPayload = null;
+        if (! empty($data['extra_payload'])) {
+            $decoded = json_decode($data['extra_payload'], true);
 
             if (json_last_error() !== JSON_ERROR_NONE) {
-                return back()->withErrors('Extra config must be valid JSON.')->withInput();
+                return back()
+                    ->withErrors(['extra_payload' => 'Extra payload must be valid JSON.'])
+                    ->withInput();
             }
 
-            $extraConfig = $decoded;
+            $extraPayload = $decoded;
         }
 
-        $shop->update([
-            'pos_provider' => $data['pos_provider'],
-            'pos_merchant_id' => $data['pos_merchant_id'],
-            'pos_api_key' => $data['pos_api_key'],
-            'pos_secret_key' => $data['pos_secret_key'],
-            'pos_extra_config' => $extraConfig,
-        ]);
+        VendorSetting::updateOrCreate(
+            ['shop_id' => $shop->id],
+            [
+                'pos_api_key' => $data['pos_api_key'],
+                'pos_api_secret' => $data['pos_api_secret'],
+                'pos_merchant_id' => $data['pos_merchant_id'],
+                'pos_terminal_id' => $data['pos_terminal_id'],
+                'pos_environment' => $data['pos_environment'],
+                'extra_payload' => $extraPayload,
+            ]
+        );
 
         return back()->with('success', 'Payment settings updated.');
     }
