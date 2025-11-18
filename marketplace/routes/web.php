@@ -88,6 +88,7 @@ Route::middleware(['auth', 'admin'])
     ->prefix('admin')
     ->name('admin.')
     ->group(function () {
+        Route::get('/', [AdminDashboardController::class, 'index'])->name('index');
         Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
         Route::resource('/categories', AdminCategoryController::class);
         Route::resource('/shops', AdminShopController::class);
