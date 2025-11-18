@@ -13,7 +13,12 @@ class AdminSliderController extends Controller
     {
         $sliders = Slider::latest()->paginate(20);
 
-        return view('admin.sliders.index', compact('sliders'));
+        $stats = [
+            'total' => Slider::count(),
+            'active' => Slider::where('is_active', true)->count(),
+        ];
+
+        return view('admin.sliders.index', compact('sliders', 'stats'));
     }
 
     public function create()

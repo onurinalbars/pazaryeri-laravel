@@ -13,7 +13,12 @@ class AdminBannerController extends Controller
     {
         $banners = Banner::latest()->paginate(20);
 
-        return view('admin.banners.index', compact('banners'));
+        $stats = [
+            'total' => Banner::count(),
+            'active' => Banner::where('is_active', true)->count(),
+        ];
+
+        return view('admin.banners.index', compact('banners', 'stats'));
     }
 
     public function create()

@@ -17,7 +17,13 @@ class AdminProductController extends Controller
             ->latest()
             ->paginate(20);
 
-        return view('admin.products.index', compact('products'));
+        $stats = [
+            'total' => Product::count(),
+            'active' => Product::where('is_active', true)->count(),
+            'low_stock' => Product::where('stock', '<', 10)->count(),
+        ];
+
+        return view('admin.products.index', compact('products', 'stats'));
     }
 
     public function create()

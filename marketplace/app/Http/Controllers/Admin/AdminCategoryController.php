@@ -16,7 +16,13 @@ class AdminCategoryController extends Controller
             ->latest()
             ->paginate(20);
 
-        return view('admin.categories.index', compact('categories'));
+        $stats = [
+            'total' => Category::count(),
+            'active' => Category::where('is_active', true)->count(),
+            'top_level' => Category::whereNull('parent_id')->count(),
+        ];
+
+        return view('admin.categories.index', compact('categories', 'stats'));
     }
 
     public function create()

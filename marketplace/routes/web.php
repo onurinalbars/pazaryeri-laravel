@@ -5,10 +5,13 @@ use App\Http\Controllers\Admin\AdminBannerController;
 use App\Http\Controllers\Admin\AdminCategoryController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\AdminListingController;
+use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\AdminProductController;
+use App\Http\Controllers\Admin\AdminSettingController;
 use App\Http\Controllers\Admin\AdminShopController;
 use App\Http\Controllers\Admin\AdminSliderController;
 use App\Http\Controllers\Admin\AdminUserController;
+use App\Http\Controllers\Admin\AdminVendorController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\CartController;
@@ -93,4 +96,19 @@ Route::middleware(['auth', 'admin'])
         Route::resource('/users', AdminUserController::class);
         Route::resource('/sliders', AdminSliderController::class);
         Route::resource('/banners', AdminBannerController::class);
+
+        Route::get('/orders', [AdminOrderController::class, 'index'])->name('orders.index');
+        Route::get('/orders/{order}', [AdminOrderController::class, 'show'])->name('orders.show');
+        Route::patch('/orders/{order}', [AdminOrderController::class, 'update'])->name('orders.update');
+
+        Route::prefix('vendors')->name('vendors.')->group(function () {
+            Route::get('/', [AdminVendorController::class, 'index'])->name('index');
+            Route::get('/{vendor}', [AdminVendorController::class, 'show'])->name('show');
+            Route::patch('/{vendor}/status', [AdminVendorController::class, 'updateStatus'])->name('status');
+        });
+
+        Route::get('/settings/site', [AdminSettingController::class, 'editSite'])->name('settings.site.edit');
+        Route::post('/settings/site', [AdminSettingController::class, 'updateSite'])->name('settings.site.update');
+        Route::get('/settings/payment', [AdminSettingController::class, 'editPayment'])->name('settings.payment.edit');
+        Route::post('/settings/payment', [AdminSettingController::class, 'updatePayment'])->name('settings.payment.update');
     });

@@ -1,8 +1,8 @@
-@extends('layouts.admin')
+@extends('admin.layout')
 
 @section('page-title', 'Kullanıcılar')
 
-@section('content')
+@section('admin-content')
     <div class="flex items-center justify-between rounded-2xl bg-white p-5 shadow">
         <div>
             <h1 class="text-xl font-semibold text-gray-800">Kullanıcılar</h1>
