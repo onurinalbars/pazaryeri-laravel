@@ -25,8 +25,21 @@
                     <div>
                         <dt class="text-xs uppercase tracking-widest text-gray-500">Durum</dt>
                         <dd>
-                            <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $shop?->is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-yellow-50 text-yellow-700' }}">
-                                {{ $shop?->is_active ? 'Onaylı' : 'Bekliyor' }}
+                            @php
+                                $status = $vendor->vendor_status ?? \App\Models\User::VENDOR_STATUS_PENDING;
+                                $statusClasses = [
+                                    \App\Models\User::VENDOR_STATUS_APPROVED => 'bg-emerald-50 text-emerald-700',
+                                    \App\Models\User::VENDOR_STATUS_PENDING => 'bg-yellow-50 text-yellow-700',
+                                    \App\Models\User::VENDOR_STATUS_SUSPENDED => 'bg-red-50 text-red-700',
+                                ];
+                                $statusLabels = [
+                                    \App\Models\User::VENDOR_STATUS_APPROVED => 'Onaylı',
+                                    \App\Models\User::VENDOR_STATUS_PENDING => 'Beklemede',
+                                    \App\Models\User::VENDOR_STATUS_SUSPENDED => 'Askıda',
+                                ];
+                            @endphp
+                            <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $statusClasses[$status] ?? 'bg-gray-100 text-gray-700' }}">
+                                {{ $statusLabels[$status] ?? ucfirst($status) }}
                             </span>
                         </dd>
                     </div>
@@ -91,8 +104,9 @@
                     <label class="text-sm font-semibold text-gray-700">
                         Durum
                         <select name="status" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2">
-                            <option value="approved" @selected($shop?->is_active)>Onayla</option>
-                            <option value="suspended" @selected(! $shop?->is_active)>Askıya Al</option>
+                            <option value="pending" @selected($vendor->vendor_status === \App\Models\User::VENDOR_STATUS_PENDING)>Beklemede</option>
+                            <option value="approved" @selected($vendor->vendor_status === \App\Models\User::VENDOR_STATUS_APPROVED)>Onaylı</option>
+                            <option value="suspended" @selected($vendor->vendor_status === \App\Models\User::VENDOR_STATUS_SUSPENDED)>Askıda</option>
                         </select>
                     </label>
                     <label class="text-sm font-semibold text-gray-700">

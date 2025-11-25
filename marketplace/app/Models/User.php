@@ -12,6 +12,14 @@ class User extends Authenticatable
     /** @use HasFactory<\Database\Factories\UserFactory> */
     use HasFactory, Notifiable;
 
+    public const ROLE_ADMIN = 'admin';
+    public const ROLE_VENDOR = 'vendor';
+    public const ROLE_USER = 'user';
+
+    public const VENDOR_STATUS_PENDING = 'pending';
+    public const VENDOR_STATUS_APPROVED = 'approved';
+    public const VENDOR_STATUS_SUSPENDED = 'suspended';
+
     /**
      * The attributes that are mass assignable.
      *
@@ -22,6 +30,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'vendor_status',
     ];
 
     /**
@@ -44,6 +53,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'vendor_status' => 'string',
         ];
     }
 
@@ -64,11 +74,26 @@ class User extends Authenticatable
 
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return $this->role === self::ROLE_ADMIN;
     }
 
     public function isVendor(): bool
     {
-        return $this->role === 'vendor';
+        return $this->role === self::ROLE_VENDOR;
+    }
+
+    public function isUser(): bool
+    {
+        return $this->role === self::ROLE_USER;
+    }
+
+    public function hasApprovedVendorStatus(): bool
+    {
+        return $this->isVendor() && $this->vendor_status === self::VENDOR_STATUS_APPROVED;
+    }
+
+    public function hasPendingVendorStatus(): bool
+    {
+        return $this->isVendor() && $this->vendor_status === self::VENDOR_STATUS_PENDING;
     }
 }

@@ -10,7 +10,7 @@ use Illuminate\Validation\Rule;
 
 class AdminUserController extends Controller
 {
-    protected array $roles = ['customer', 'vendor', 'admin'];
+    protected array $roles = [User::ROLE_USER, User::ROLE_VENDOR, User::ROLE_ADMIN];
 
     public function index()
     {
@@ -26,7 +26,7 @@ class AdminUserController extends Controller
 
     public function store(Request $request)
     {
-        $data = $this->validateUser($request);
+        $data = $this->prepareRoleData($this->validateUser($request));
 
         User::create($data);
 
@@ -43,7 +43,7 @@ class AdminUserController extends Controller
 
     public function update(Request $request, User $user)
     {
-        $data = $this->validateUser($request, $user->id);
+        $data = $this->prepareRoleData($this->validateUser($request, $user->id));
 
         if (empty($data['password'])) {
             unset($data['password']);
@@ -78,6 +78,15 @@ class AdminUserController extends Controller
         if (! empty($data['password'])) {
             $data['password'] = Hash::make($data['password']);
         }
+
+        return $data;
+    }
+
+    protected function prepareRoleData(array $data): array
+    {
+        $data['vendor_status'] = ($data['role'] ?? null) === User::ROLE_VENDOR
+            ? User::VENDOR_STATUS_APPROVED
+            : null;
 
         return $data;
     }

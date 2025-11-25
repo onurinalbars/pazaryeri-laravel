@@ -10,7 +10,7 @@
     Rol
     <select name="role" class="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2">
         @foreach($roles as $role)
-            <option value="{{ $role }}" @selected(old('role', $user->role ?? 'customer') === $role)>{{ ucfirst($role) }}</option>
+            <option value="{{ $role }}" @selected(old('role', $user->role ?? \App\Models\User::ROLE_USER) === $role)>{{ ucfirst($role) }}</option>
         @endforeach
     </select>
 </label>

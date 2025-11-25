@@ -14,8 +14,8 @@ class AdminDashboardController extends Controller
     public function index()
     {
         $metrics = [
-            'vendors' => User::where('role', 'vendor')->count(),
-            'customers' => User::where('role', 'customer')->count(),
+            'vendors' => User::where('role', User::ROLE_VENDOR)->count(),
+            'customers' => User::where('role', User::ROLE_USER)->count(),
             'products' => Product::count(),
             'listings' => Listing::count(),
             'shops' => Shop::count(),

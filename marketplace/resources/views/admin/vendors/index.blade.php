@@ -33,6 +33,19 @@
             <tbody class="divide-y divide-gray-100">
                 @foreach($vendors as $vendor)
                     @php($shop = $vendor->shop)
+                    @php
+                        $status = $vendor->vendor_status ?? \App\Models\User::VENDOR_STATUS_PENDING;
+                        $statusClasses = [
+                            \App\Models\User::VENDOR_STATUS_APPROVED => 'bg-emerald-50 text-emerald-700',
+                            \App\Models\User::VENDOR_STATUS_PENDING => 'bg-yellow-50 text-yellow-700',
+                            \App\Models\User::VENDOR_STATUS_SUSPENDED => 'bg-red-50 text-red-700',
+                        ];
+                        $statusLabels = [
+                            \App\Models\User::VENDOR_STATUS_APPROVED => 'Onaylı',
+                            \App\Models\User::VENDOR_STATUS_PENDING => 'Beklemede',
+                            \App\Models\User::VENDOR_STATUS_SUSPENDED => 'Askıda',
+                        ];
+                    @endphp
                     <tr>
                         <td class="px-4 py-4">
                             <p class="font-semibold text-gray-900">{{ $vendor->name }}</p>
@@ -45,8 +58,8 @@
                         <td class="px-4 py-4 text-sm font-semibold text-gray-900">{{ number_format($shop->orders_count ?? 0) }}</td>
                         <td class="px-4 py-4 text-right">
                             <div class="flex items-center justify-end gap-3">
-                                <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $shop?->is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-yellow-50 text-yellow-700' }}">
-                                    {{ $shop?->is_active ? 'Onaylı' : 'Bekliyor' }}
+                                <span class="rounded-full px-3 py-1 text-xs font-semibold {{ $statusClasses[$status] ?? 'bg-gray-100 text-gray-700' }}">
+                                    {{ $statusLabels[$status] ?? ucfirst($status) }}
                                 </span>
                                 <a href="{{ route('admin.vendors.show', $vendor) }}" class="text-sm font-semibold text-emerald-600 hover:underline">
                                     Detay

@@ -27,7 +27,8 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Platform Admin',
                 'password' => Hash::make('password'),
-                'role' => 'admin',
+                'role' => User::ROLE_ADMIN,
+                'vendor_status' => null,
             ]
         );
 
@@ -65,7 +66,8 @@ class DatabaseSeeder extends Seeder
                 [
                     'name' => $data['name'],
                     'password' => Hash::make('password'),
-                    'role' => 'vendor',
+                    'role' => User::ROLE_VENDOR,
+                    'vendor_status' => User::VENDOR_STATUS_APPROVED,
                 ]
             );
 
@@ -131,7 +133,8 @@ class DatabaseSeeder extends Seeder
             [
                 'name' => 'Demo Customer',
                 'password' => Hash::make('password'),
-                'role' => 'customer',
+                'role' => User::ROLE_USER,
+                'vendor_status' => null,
             ]
         );
 
