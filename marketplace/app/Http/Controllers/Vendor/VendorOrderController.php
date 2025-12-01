@@ -13,6 +13,7 @@ class VendorOrderController extends Controller
         $orders = $request->user()->shop
             ->orders()
             ->with('user')
+            ->withCount('items')
             ->latest()
             ->paginate(20);
 

@@ -30,6 +30,12 @@ class VendorMiddleware
             ]);
         }
 
+        if (! $user->isVendorApproved()
+            && ! $request->routeIs('vendor.pending')
+            && ! $request->routeIs('vendor.dashboard')) {
+            return redirect()->route('vendor.pending');
+        }
+
         return $next($request);
     }
 }

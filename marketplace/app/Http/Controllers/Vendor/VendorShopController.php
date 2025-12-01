@@ -26,6 +26,7 @@ class VendorShopController extends Controller
             'description' => ['nullable', 'string'],
             'is_active' => ['nullable', 'boolean'],
             'logo' => ['nullable', 'image', 'max:2048'],
+            'banner' => ['nullable', 'image', 'max:4096'],
         ]);
 
         $data['is_active'] = $request->boolean('is_active');
@@ -36,6 +37,14 @@ class VendorShopController extends Controller
             }
 
             $data['logo'] = $request->file('logo')->store('shops', 'public');
+        }
+
+        if ($request->hasFile('banner')) {
+            if ($shop->banner) {
+                Storage::disk('public')->delete($shop->banner);
+            }
+
+            $data['banner'] = $request->file('banner')->store('shops/banners', 'public');
         }
 
         $shop->update($data);
